@@ -23,32 +23,31 @@ void HandleEvent(SDL_Event event)
 		case SDL_QUIT:
 			gameover = 1;
 			break;
-			
 		/* handle the keyboard */
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 				case SDLK_ESCAPE:
-				case SDLK_q:
+				case SDLK_q: /* bye bye */
 					gameover = 1;
 					break;
 				case SDLK_LEFT:
-					rcSrc.x = (rcSrc.x + 40)%160;
-          rcDoor.x -= 10;
-          break;
+					rcSrc.x = (rcSrc.x + 40)%160; /* sprite rectangle movement */
+					rcDoor.x -= 10; /* door movement */
+					break;
 				case SDLK_RIGHT:
 					rcSrc.x = (rcSrc.x + 40)%160;
-          rcDoor.x += 10;
+					rcDoor.x += 10;
 					break;
-#if 0
-        case SDLK_UP:
+				#if 0
+				case SDLK_UP:
 					rcSrc.x = (rcSrc.x + 40)%160;
-          rcSrcDoor.y += 10;
-          break;
-        case SDLK_DOWN:
+					rcSrcDoor.y += 10;
+					break;
+				case SDLK_DOWN:
 					rcSrc.x = (rcSrc.x + 40)%160;
-          rcSrcDoor.y -= 10;
-          break;
-#endif
+					rcSrcDoor.y -= 10;
+					break;
+				#endif
 			}
 			break;
 	}
@@ -56,8 +55,9 @@ void HandleEvent(SDL_Event event)
 
 int main(int argc, char* argv[])
 {
-	SDL_Surface *screen, *temp, *sprite, *door, *background;
-  SDL_Rect rcBackground;
+	SDL_Surface *screen, *temp, *sprite, *door, *background, *floor; 
+	SDL_Rect rcBackground; /* background rectangle */
+	SDL_Rect rcFloor; /* chaozinho roxo */
 	int colorkey;
 	int x,y;
 
@@ -73,67 +73,64 @@ int main(int argc, char* argv[])
 	/* set keyboard repeat */
 	SDL_EnableKeyRepeat(70, 70);
 
-	/* load sprite */
-	temp   = SDL_LoadBMP("sprites.bmp");
+	/* load sprite damatta */
+	temp = SDL_LoadBMP("sprites.bmp");
 	sprite = SDL_DisplayFormat(temp);
+	SDL_FreeSurface(temp);
+
+	/* load background image  */
+	temp  = SDL_LoadBMP("back.bmp");
+	background = SDL_DisplayFormat(temp);
+
+	/* ler o chao */
+	temp  = SDL_LoadBMP("ground.bmp");
+	floor = SDL_DisplayFormat(temp);
+
+	/* ler as portas */
+	//temp  = SDL_LoadBMP("lol5.bmp");
+	temp  = SDL_LoadBMP("porta.bmp");
+	door = SDL_DisplayFormat(temp);
 	SDL_FreeSurface(temp);
 
 	/* setup sprite colorkey and turn on RLE */
 	colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
 	SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+	SDL_SetColorKey(door, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
-	/* load grass */
-	temp  = SDL_LoadBMP("back.bmp");
-  background = SDL_DisplayFormat(temp);
-	temp  = SDL_LoadBMP("lol5.bmp");
-	door = SDL_DisplayFormat(temp);
-	SDL_FreeSurface(temp);
-
-	/* set sprite position */
+	/* posicao inicial do damatta */
 	rcSprite.x = 150;
 	rcSprite.y = 150;
 
-	SDL_SetColorKey(door, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-  
-	/* set animation frame */
+	/* define o tamanho e o *frame* do boneco */
 	rcSrc.x = 0;
 	rcSrc.y = 0;
 	rcSrc.w = SPRITE_WIDTH;
 	rcSrc.h = SPRITE_HEIGHT;
 
-  rcSrcDoor.x = 0;
-  rcSrcDoor.y = 0;
-  rcSrcDoor.w = door->w;
-  rcSrcDoor.h = door->h;
+	/* define o tamanho das portas */
+	rcSrcDoor.x = 0;
+	rcSrcDoor.y = 0;
+	rcSrcDoor.w = door->w;
+	rcSrcDoor.h = door->h;
 
-  rcDoor.x = 350;
-  rcDoor.y = 80;
+	rcDoor.x = 350;
+	rcDoor.y = 126;
 
-	gameover = 0;
+	rcFloor.h = floor->h;
+	rcFloor.w = floor->w;
+
+	gameover = 0; // usada pra sair
 
 	/* message pump */
 	while (!gameover)
 	{
-		SDL_WaitEvent(NULL);
+		SDL_WaitEvent(NULL); /* para nao consumir 100% do cpu */
 		SDL_Event event;
 		
 		/* look for an event */
 		if (SDL_PollEvent(&event)) {
 			HandleEvent(event);
 		}
-
-/*
-		// collide with edges of screen 
-		if (rcSprite.x <= 0)
-			rcSprite.x = 0;
-		if (rcSprite.x >= SCREEN_WIDTH - SPRITE_WIDTH) 
-			rcSprite.x = SCREEN_WIDTH - SPRITE_WIDTH;
-
-		if (rcSprite.y <= 0)
-			rcSprite.y = 0;
-		if (rcSprite.y >= SCREEN_HEIGHT - SPRITE_HEIGHT) 
-			rcSprite.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
-*/
 
 		// draw the background
 		for (x = 0; x < SCREEN_WIDTH / BACK_SIZE; x++) {
@@ -144,7 +141,16 @@ int main(int argc, char* argv[])
 			}
 		}
 
-    SDL_BlitSurface(door, &rcSrcDoor, screen, &rcDoor);
+		/* the floor line *purple fag* */
+		for (x = 0; x < SCREEN_WIDTH / floor->w; x++) {
+				rcFloor.x= x * floor->w;
+				rcFloor.y = 262;
+				SDL_BlitSurface(floor, NULL, screen, &rcFloor);
+		}
+
+		/* draw the door */
+		SDL_BlitSurface(door, &rcSrcDoor, screen, &rcDoor);
+
 		/* draw the sprite */
 		SDL_BlitSurface(sprite, &rcSrc, screen, &rcSprite);
 

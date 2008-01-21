@@ -93,7 +93,8 @@ int main(int argc, char* argv[])
 			HandleEvent(event);
 		}
 
-		/* collide with edges of screen */
+/*
+		// collide with edges of screen 
 		if (rcSprite.x <= 0)
 			rcSprite.x = 0;
 		if (rcSprite.x >= SCREEN_WIDTH - SPRITE_WIDTH) 
@@ -103,6 +104,7 @@ int main(int argc, char* argv[])
 			rcSprite.y = 0;
 		if (rcSprite.y >= SCREEN_HEIGHT - SPRITE_HEIGHT) 
 			rcSprite.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
+*/
 
 		// draw the grass 
 		for (x = 0; x < SCREEN_WIDTH / BACK_SIZE; x++) {

@@ -1,4 +1,4 @@
-
+/* this game can never fail */
 #include "SDL.h"
 
 #define SCREEN_WIDTH  640
@@ -12,6 +12,7 @@ int gameover;
 
 /* source and destination rectangles */
 SDL_Rect rcSrc, rcSprite;
+SDL_Rect rcSrcDoor, rcDoor;
 
 void HandleEvent(SDL_Event event)
 {
@@ -28,9 +29,14 @@ void HandleEvent(SDL_Event event)
 				case SDLK_q:
 					gameover = 1;
 					break;
+				case SDLK_LEFT:
+					rcSrc.x = (rcSrc.x - 40)%160;
+					//rcSprite.x += 8;
+          rcSrcDoor.x = (rcSrcDoor.x - 40)%160;
 				case SDLK_RIGHT:
 					rcSrc.x = (rcSrc.x + 40)%160;
 					//rcSprite.x += 8;
+          rcSrcDoor.x = (rcSrcDoor.x + 40)%160;
 					break;
 			}
 			break;
@@ -39,8 +45,8 @@ void HandleEvent(SDL_Event event)
 
 int main(int argc, char* argv[])
 {
-	SDL_Surface *screen, *temp, *sprite, *grass;
-	SDL_Rect rcGrass;
+	SDL_Surface *screen, *temp, *sprite, *door, *background;
+  SDL_Rect rcBackground;
 	int colorkey;
 	int x,y;
 
@@ -67,9 +73,12 @@ int main(int argc, char* argv[])
 
 	/* load grass */
 	temp  = SDL_LoadBMP("back.bmp");
-	grass = SDL_DisplayFormat(temp);
+  background = SDL_DisplayFormat(temp);
+	temp  = SDL_LoadBMP("lol5.bmp");
+	door = SDL_DisplayFormat(temp);
 	SDL_FreeSurface(temp);
 
+	SDL_SetColorKey(door, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 	/* set sprite position */
 	rcSprite.x = 150;
 	rcSprite.y = 150;
@@ -79,6 +88,11 @@ int main(int argc, char* argv[])
 	rcSrc.y = 0;
 	rcSrc.w = SPRITE_WIDTH;
 	rcSrc.h = SPRITE_HEIGHT;
+
+  rcSrcDoor.x = 0;
+  rcSrcDoor.y = 0;
+  rcSrcDoor.w = 400;
+  rcSrcDoor.h = 400;
 
 	gameover = 0;
 
@@ -106,15 +120,18 @@ int main(int argc, char* argv[])
 			rcSprite.y = SCREEN_HEIGHT - SPRITE_HEIGHT;
 */
 
-		// draw the grass 
+		// draw the background
 		for (x = 0; x < SCREEN_WIDTH / BACK_SIZE; x++) {
 			for (y = 0; y < SCREEN_HEIGHT / BACK_SIZE; y++) {
-				rcGrass.x = x * BACK_SIZE;
-				rcGrass.y = y * BACK_SIZE;
-				SDL_BlitSurface(grass, NULL, screen, &rcGrass);
+				rcBackground.x = x * BACK_SIZE;
+				rcBackground.y = y * BACK_SIZE;
+				SDL_BlitSurface(background, NULL, screen, &rcBackground);
 			}
 		}
+    rcDoor.x = 200;
+    rcDoor.y = -120;
 
+    SDL_BlitSurface(door, &rcSrcDoor, screen, &rcDoor);
 		/* draw the sprite */
 		SDL_BlitSurface(sprite, &rcSrc, screen, &rcSprite);
 
@@ -124,7 +141,8 @@ int main(int argc, char* argv[])
 
 	/* clean up */
 	SDL_FreeSurface(sprite);
-	SDL_FreeSurface(grass);
+	SDL_FreeSurface(door);
+	SDL_FreeSurface(background);
 	SDL_Quit();
 
 	return 0;

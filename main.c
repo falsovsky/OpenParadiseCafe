@@ -6,6 +6,8 @@
 #define SPRITE_WIDTH     40
 #define SPRITE_HEIGHT     128
 
+#define DOOR_SIZE 400
+
 #define BACK_SIZE	32
 
 int gameover;
@@ -30,14 +32,27 @@ void HandleEvent(SDL_Event event)
 					gameover = 1;
 					break;
 				case SDLK_LEFT:
-					rcSrc.x = (rcSrc.x - 40)%160;
-					//rcSprite.x += 8;
-          rcSrcDoor.x = (rcSrcDoor.x - 40)%160;
-				case SDLK_RIGHT:
 					rcSrc.x = (rcSrc.x + 40)%160;
-					//rcSprite.x += 8;
-          rcSrcDoor.x = (rcSrcDoor.x + 40)%160;
+          if (rcSrcDoor.x < 0) rcSrcDoor.x = 0;
+          else if (rcSrcDoor.x > SCREEN_WIDTH - DOOR_SIZE) rcSrcDoor.x = SCREEN_WIDTH - DOOR_SIZE;
+          rcSrcDoor.x -= 10;
+          break;
+				case SDLK_RIGHT:
+          if (rcSrcDoor.x < 0) rcSrcDoor.x = 0;
+          else if (rcSrcDoor.x > SCREEN_WIDTH - DOOR_SIZE) rcSrcDoor.x = SCREEN_WIDTH - DOOR_SIZE;
+					rcSrc.x = (rcSrc.x + 40)%160;
+          rcSrcDoor.x += 10;
 					break;
+#if 0
+        case SDLK_UP:
+					rcSrc.x = (rcSrc.x + 40)%160;
+          rcSrcDoor.y += 10;
+          break;
+        case SDLK_DOWN:
+					rcSrc.x = (rcSrc.x + 40)%160;
+          rcSrcDoor.y -= 10;
+          break;
+#endif
 			}
 			break;
 	}
@@ -54,7 +69,7 @@ int main(int argc, char* argv[])
 	SDL_Init(SDL_INIT_VIDEO);
 
 	/* set the title bar */
-	SDL_WM_SetCaption("SDL Animation", "SDL Animation");
+	SDL_WM_SetCaption("Open Paradise Cafe", "Open Paradise Cafe");
 
 	/* create window */
 	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
@@ -78,10 +93,14 @@ int main(int argc, char* argv[])
 	door = SDL_DisplayFormat(temp);
 	SDL_FreeSurface(temp);
 
-	SDL_SetColorKey(door, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 	/* set sprite position */
 	rcSprite.x = 150;
 	rcSprite.y = 150;
+
+	SDL_SetColorKey(door, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+  
+  rcDoor.x = 200;
+  rcDoor.y = -120;
 
 	/* set animation frame */
 	rcSrc.x = 0;
@@ -91,8 +110,8 @@ int main(int argc, char* argv[])
 
   rcSrcDoor.x = 0;
   rcSrcDoor.y = 0;
-  rcSrcDoor.w = 400;
-  rcSrcDoor.h = 400;
+  rcSrcDoor.w = DOOR_SIZE;
+  rcSrcDoor.h = DOOR_SIZE;
 
 	gameover = 0;
 

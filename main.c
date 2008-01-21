@@ -28,59 +28,10 @@ void HandleEvent(SDL_Event event)
 				case SDLK_q:
 					gameover = 1;
 					break;
-				/*
-				case SDLK_LEFT:
-					if ( rcSrc.x == 192 )
-						rcSrc.x = 224;
-					else
-						rcSrc.x = 192;
-					rcSprite.x -= 5;
-					break;
-				*/
 				case SDLK_RIGHT:
-					/*
-					if ( rcSrc.x == 64 )
-						rcSrc.x = 96;
-					else
-						rcSrc.x = 64;
-					*/
-					/*
-					if ( rcSrc.x == 120)
-						rcSrc.x = 0;
-
-					if ( rcSrc.x == 80)
-						rcSrc.x = 120;
-
-					if ( rcSrc.x == 40)
-						rcSrc.x = 80;
-					
-					if ( rcSrc.x == 0)
-					 rcSrc.x = 40;
-					*/
 					rcSrc.x = (rcSrc.x + 40)%160;
-
-
-					//else
-					//	rcSrc.x = 0;
-
 					//rcSprite.x += 8;
 					break;
-				/*
-				case SDLK_UP:
-					if ( rcSrc.x == 0 )
-						rcSrc.x = 32;
-					else
-						rcSrc.x = 0;
-					rcSprite.y -= 5;
-					break;
-				case SDLK_DOWN:
-					if ( rcSrc.x == 128 )
-						rcSrc.x = 160;
-					else
-						rcSrc.x = 128;
-					rcSprite.y += 5;
-					break;
-				*/
 			}
 			break;
 	}

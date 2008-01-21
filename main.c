@@ -33,15 +33,11 @@ void HandleEvent(SDL_Event event)
 					break;
 				case SDLK_LEFT:
 					rcSrc.x = (rcSrc.x + 40)%160;
-          if (rcSrcDoor.x < 0) rcSrcDoor.x = 0;
-          else if (rcSrcDoor.x > SCREEN_WIDTH - DOOR_SIZE) rcSrcDoor.x = SCREEN_WIDTH - DOOR_SIZE;
-          rcSrcDoor.x -= 10;
+          rcDoor.x -= 10;
           break;
 				case SDLK_RIGHT:
-          if (rcSrcDoor.x < 0) rcSrcDoor.x = 0;
-          else if (rcSrcDoor.x > SCREEN_WIDTH - DOOR_SIZE) rcSrcDoor.x = SCREEN_WIDTH - DOOR_SIZE;
 					rcSrc.x = (rcSrc.x + 40)%160;
-          rcSrcDoor.x += 10;
+          rcDoor.x += 10;
 					break;
 #if 0
         case SDLK_UP:
@@ -99,9 +95,6 @@ int main(int argc, char* argv[])
 
 	SDL_SetColorKey(door, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
   
-  rcDoor.x = 200;
-  rcDoor.y = -120;
-
 	/* set animation frame */
 	rcSrc.x = 0;
 	rcSrc.y = 0;
@@ -110,8 +103,11 @@ int main(int argc, char* argv[])
 
   rcSrcDoor.x = 0;
   rcSrcDoor.y = 0;
-  rcSrcDoor.w = DOOR_SIZE;
-  rcSrcDoor.h = DOOR_SIZE;
+  rcSrcDoor.w = door->w;
+  rcSrcDoor.h = door->h;
+
+  rcDoor.x = 350;
+  rcDoor.y = 80;
 
 	gameover = 0;
 
@@ -147,8 +143,6 @@ int main(int argc, char* argv[])
 				SDL_BlitSurface(background, NULL, screen, &rcBackground);
 			}
 		}
-    rcDoor.x = 200;
-    rcDoor.y = -120;
 
     SDL_BlitSurface(door, &rcSrcDoor, screen, &rcDoor);
 		/* draw the sprite */

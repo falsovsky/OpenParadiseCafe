@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 	/* define o tamanho das portas */
 	rcSrcDoor.x = 0;
 	rcSrcDoor.y = 0;
-	rcSrcDoor.w = 56; // so a primeira frame
+	rcSrcDoor.w = 56; /* so a primeira frame */
 	rcSrcDoor.h = door->h;
 
 	rcDoor.x = 350;
@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
 	rcFloor.h = floor->h;
 	rcFloor.w = floor->w;
 
-	gameover = 0; // usada pra sair
+	gameover = 0; /* usada pra sair */
 
 	/* load a font and give it a point-size */
 	fntText = TTF_OpenFont("arial.ttf", 12);
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
 			door_param.frame = 1;
 			door_param.timer = SDL_AddTimer(250, door_timer_callback, &door_param);
 /*			event.type = SDL_USEREVENT;
-			event.user.code = 1; // 1 = Chegou se à porta
+			event.user.code = USEREVENT_DOOR;
 			event.user.data1 = 0;
 			event.user.data2 = 0;
 			SDL_PushEvent(&event);*/
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
 
 		fprintf(stderr,"Porta: x %d , y %d",rcDoor.x,rcDoor.y); 
 
-		// draw the background
+		/*  draw the background */
 		for (x = 0; x < SCREEN_WIDTH / BACK_SIZE; x++) {
 			for (y = 0; y < SCREEN_HEIGHT / BACK_SIZE; y++) {
 				rcBackground.x = x * BACK_SIZE;

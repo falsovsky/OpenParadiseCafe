@@ -16,6 +16,8 @@ int gameover;
 SDL_Rect rcSrc, rcSprite;
 SDL_Rect rcSrcDoor, rcDoor;
 
+int i;
+
 void HandleEvent(SDL_Event event)
 {
 	switch (event.type) {
@@ -38,18 +40,21 @@ void HandleEvent(SDL_Event event)
 					rcSrc.x = (rcSrc.x + 40)%160;
 					rcDoor.x += 10;
 					break;
-				#if 0
-				case SDLK_UP:
-					rcSrc.x = (rcSrc.x + 40)%160;
-					rcSrcDoor.y += 10;
-					break;
-				case SDLK_DOWN:
-					rcSrc.x = (rcSrc.x + 40)%160;
-					rcSrcDoor.y -= 10;
-					break;
-				#endif
 			}
 			break;
+		case SDL_USEREVENT:
+			switch (event.user.code) {
+				case 1:
+					if (rcSrcDoor.x == 0) 
+					for (i = 0; i <= 4; i++) {
+						rcSrcDoor.x = i*56;
+						rcSrcDoor.y = 0;
+						rcSrcDoor.w = 56;
+						rcSrcDoor.h = 136;
+					}
+			}
+			break;
+				
 	}
 }
 
@@ -87,7 +92,6 @@ int main(int argc, char* argv[])
 	floor = SDL_DisplayFormat(temp);
 
 	/* ler as portas */
-	//temp  = SDL_LoadBMP("lol5.bmp");
 	temp  = SDL_LoadBMP("porta.bmp");
 	door = SDL_DisplayFormat(temp);
 	SDL_FreeSurface(temp);
@@ -110,12 +114,13 @@ int main(int argc, char* argv[])
 	/* define o tamanho das portas */
 	rcSrcDoor.x = 0;
 	rcSrcDoor.y = 0;
-	rcSrcDoor.w = door->w;
+	rcSrcDoor.w = 56; // so a primeira frame
 	rcSrcDoor.h = door->h;
 
 	rcDoor.x = 350;
 	rcDoor.y = 126;
 
+	/* chao */
 	rcFloor.h = floor->h;
 	rcFloor.w = floor->w;
 
@@ -126,11 +131,22 @@ int main(int argc, char* argv[])
 	{
 		SDL_WaitEvent(NULL); /* para nao consumir 100% do cpu */
 		SDL_Event event;
-		
+
+		/* /!\ ACHTUNG: DOOR /!\ */
+		if (rcDoor.x == 180) {
+			event.type = SDL_USEREVENT;
+			event.user.code = 1; // 1 = Chegou se à porta
+			event.user.data1 = 0;
+			event.user.data2 = 0;
+			SDL_PushEvent(&event);
+		}
+
 		/* look for an event */
 		if (SDL_PollEvent(&event)) {
 			HandleEvent(event);
 		}
+
+		fprintf(stderr,"Porta: x %d , y %d",rcDoor.x,rcDoor.y); 
 
 		// draw the background
 		for (x = 0; x < SCREEN_WIDTH / BACK_SIZE; x++) {

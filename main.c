@@ -1,6 +1,6 @@
 /* this game can never fail */
-#include "SDL.h"
-#include "SDL_thread.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 #define SCREEN_WIDTH		640
 #define SCREEN_HEIGHT		480
@@ -123,11 +123,22 @@ int main(int argc, char* argv[])
 	SDL_Surface *screen, *temp, *sprite, *door, *background, *floor; 
 	SDL_Rect rcBackground; /* background rectangle */
 	SDL_Rect rcFloor; /* chaozinho roxo */
+	/* text stuff */
+	TTF_Font *fntTime;
+	SDL_Rect rcTime = { 20, 50, 0,0 };
+	SDL_Color clrTime = { 0,0,0, 0 };
+
 	int colorkey;
 	int x,y;
 
 	/* initialize SDL */
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+
+	/* initialize SDL_ttf */
+	if(TTF_Init() == -1) {
+		printf("TTF_Init: %s\n", TTF_GetError());
+		exit(1);
+	}
 
 	/* set the title bar */
 	SDL_WM_SetCaption("Open Paradise Cafe", "Open Paradise Cafe");
@@ -186,6 +197,13 @@ int main(int argc, char* argv[])
 
 	gameover = 0; // usada pra sair
 
+	/* load a font and give it a point-size */
+	fntTime = TTF_OpenFont("arial.ttf", 12);
+	if(!fntTime) {
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		exit(1);
+	}
+
 	/* message pump */
 	while (!gameover)
 	{
@@ -232,6 +250,11 @@ int main(int argc, char* argv[])
 
 		/* draw the sprite */
 		SDL_BlitSurface(sprite, &rcSrc, screen, &rcSprite);
+
+		/* render text to an SDL_Surface */
+		SDL_Surface *sTime = TTF_RenderText_Solid(fntTime, "dongs", clrTime);
+		/* blit text to the screen */
+		SDL_BlitSurface(sTime, NULL, screen, &rcTime);
 
 		/* update the screen */
 		SDL_UpdateRect(screen, 0, 0, 0, 0);

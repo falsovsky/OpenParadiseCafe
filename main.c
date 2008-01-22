@@ -124,9 +124,9 @@ int main(int argc, char* argv[])
 	SDL_Rect rcBackground; /* background rectangle */
 	SDL_Rect rcFloor; /* chaozinho roxo */
 	/* text stuff */
-	TTF_Font *fntTime;
-	SDL_Rect rcTime = { 20, 50, 0,0 };
-	SDL_Color clrTime = { 0,0,0, 0 };
+	TTF_Font *fntText;
+	SDL_Rect rcText = { 20, 50, 0,0 };
+	SDL_Color clrText = { 0,0,0, 0 };
 
 	int colorkey;
 	int x,y;
@@ -198,8 +198,8 @@ int main(int argc, char* argv[])
 	gameover = 0; // usada pra sair
 
 	/* load a font and give it a point-size */
-	fntTime = TTF_OpenFont("arial.ttf", 12);
-	if(!fntTime) {
+	fntText = TTF_OpenFont("arial.ttf", 12);
+	if(!fntText) {
 		printf("TTF_OpenFont: %s\n", TTF_GetError());
 		exit(1);
 	}
@@ -252,9 +252,9 @@ int main(int argc, char* argv[])
 		SDL_BlitSurface(sprite, &rcSrc, screen, &rcSprite);
 
 		/* render text to an SDL_Surface */
-		SDL_Surface *sTime = TTF_RenderText_Solid(fntTime, "dongs", clrTime);
+		SDL_Surface *sText = TTF_RenderText_Solid(fntText, "dongs", clrText);
 		/* blit text to the screen */
-		SDL_BlitSurface(sTime, NULL, screen, &rcTime);
+		SDL_BlitSurface(sText, NULL, screen, &rcText);
 
 		/* update the screen */
 		SDL_UpdateRect(screen, 0, 0, 0, 0);

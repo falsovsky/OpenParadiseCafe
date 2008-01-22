@@ -1,14 +1,18 @@
 /* this game can never fail */
 #include "SDL.h"
+#include "SDL_thread.h"
 
-#define SCREEN_WIDTH  640
-#define SCREEN_HEIGHT 480
-#define SPRITE_WIDTH     40
-#define SPRITE_HEIGHT     128
+#define SCREEN_WIDTH		640
+#define SCREEN_HEIGHT		480
+#define SPRITE_WIDTH		40
+#define SPRITE_HEIGHT		128
 
-#define DOOR_SIZE 400
+#define DOOR_SIZE		400
 
-#define BACK_SIZE	32
+#define BACK_SIZE		32
+
+#define USEREVENT_REDRAW	0
+#define USEREVENT_DOOR		1
 
 int gameover;
 
@@ -17,6 +21,47 @@ SDL_Rect rcSrc, rcSprite;
 SDL_Rect rcSrcDoor, rcDoor;
 
 int i;
+
+/* always-walk timer */
+
+SDL_TimerID jewish_timer = NULL;
+
+struct jewish_param_t {
+	int lol;
+} jewish_param;
+
+Uint32 jewish_timer_callback(Uint32 interval, void *param)
+{
+	SDL_Event event;
+	event.type = SDL_KEYDOWN;
+	event.key.keysym.sym = ((struct jewish_param_t *)param)->lol;
+	SDL_PushEvent(&event);
+	return interval;
+}
+
+/* door timer */
+
+int door_closed = 1;	/* to make sure the door only opens once */
+
+struct door_param_t {
+	int frame;
+	SDL_TimerID timer;
+} door_param;
+
+Uint32 door_timer_callback(Uint32 interval, void *param)
+{
+	SDL_Event event;
+	int frame = ((struct door_param_t *)param)->frame;
+	rcSrcDoor.x = frame*56;
+	if(++frame > 4)
+		SDL_RemoveTimer(((struct door_param_t *)param)->timer);
+	else
+		((struct door_param_t *)param)->frame = frame;
+	event.type = SDL_USEREVENT;
+	event.user.code = USEREVENT_REDRAW;
+	SDL_PushEvent(&event);
+	return interval;
+}
 
 void HandleEvent(SDL_Event event)
 {
@@ -33,18 +78,33 @@ void HandleEvent(SDL_Event event)
 					gameover = 1;
 					break;
 				case SDLK_LEFT:
+					rcSrc.x = (rcSrc.x + 40)%160;
+					rcDoor.x += 10;
+					break;
+				case SDLK_RIGHT:
 					rcSrc.x = (rcSrc.x + 40)%160; /* sprite rectangle movement */
 					rcDoor.x -= 10; /* door movement */
 					break;
-				case SDLK_RIGHT:
-					rcSrc.x = (rcSrc.x + 40)%160;
-					rcDoor.x += 10;
+				case SDLK_PAGEUP:
+					jewish_param.lol = SDLK_RIGHT;
+				case SDLK_PAGEDOWN:
+					if(event.key.keysym.sym == SDLK_PAGEDOWN)
+						jewish_param.lol = SDLK_LEFT;
+					if(jewish_timer == NULL)
+						jewish_timer = SDL_AddTimer(100, jewish_timer_callback, &jewish_param);
+					else {
+						SDL_RemoveTimer(jewish_timer);
+						jewish_timer = NULL;
+					}
 					break;
 			}
 			break;
 		case SDL_USEREVENT:
 			switch (event.user.code) {
-				case 1:
+				case USEREVENT_REDRAW:
+					break;
+				case USEREVENT_DOOR:
+					printf("wtc\n\n\n");
 					if (rcSrcDoor.x == 0) 
 					for (i = 0; i <= 4; i++) {
 						rcSrcDoor.x = i*56;
@@ -67,7 +127,7 @@ int main(int argc, char* argv[])
 	int x,y;
 
 	/* initialize SDL */
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
 	/* set the title bar */
 	SDL_WM_SetCaption("Open Paradise Cafe", "Open Paradise Cafe");
@@ -133,12 +193,15 @@ int main(int argc, char* argv[])
 		SDL_Event event;
 
 		/* /!\ ACHTUNG: DOOR /!\ */
-		if (rcDoor.x == 180) {
-			event.type = SDL_USEREVENT;
+		if (rcDoor.x == 180 && door_closed) {
+			door_closed = 0;
+			door_param.frame = 1;
+			door_param.timer = SDL_AddTimer(250, door_timer_callback, &door_param);
+/*			event.type = SDL_USEREVENT;
 			event.user.code = 1; // 1 = Chegou se à porta
 			event.user.data1 = 0;
 			event.user.data2 = 0;
-			SDL_PushEvent(&event);
+			SDL_PushEvent(&event);*/
 		}
 
 		/* look for an event */

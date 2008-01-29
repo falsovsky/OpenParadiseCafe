@@ -1,3 +1,9 @@
+/* This program is free software. It comes without any warranty, to
+* the extent permitted by applicable law. You can redistribute it
+* and/or modify it under the terms of the Do What The Fuck You Want
+* To Public License, Version 2, as published by Sam Hocevar. See
+* http://sam.zoy.org/wtfpl/COPYING for more details. */
+
 /* this game can never fail */
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -27,7 +33,7 @@ int i;
 SDL_TimerID jewish_timer = NULL;
 
 struct jewish_param_t {
-	int lol;
+	SDLKey lol;
 } jewish_param;
 
 Uint32 jewish_timer_callback(Uint32 interval, void *param)
@@ -84,6 +90,18 @@ void HandleEvent(SDL_Event event)
 				case SDLK_RIGHT:
 					rcSrc.x = (rcSrc.x + 40)%160; /* sprite rectangle movement */
 					rcDoor.x -= 10; /* door movement */
+/*
+					if (rcDoor.w<=0) {
+						rcDoor.w=56;
+						rcDoor.x = 220;
+					}
+*/
+					/* failed scroller */
+					if (rcDoor.x<=50) {
+						//rcDoor.w -= 10;
+						rcDoor.w = (rcDoor.w - 10);
+					}
+
 					break;
 				case SDLK_PAGEUP:
 					jewish_param.lol = SDLK_RIGHT;
@@ -120,14 +138,14 @@ void HandleEvent(SDL_Event event)
 
 int main(int argc, char* argv[])
 {
-	SDL_Surface *screen, *temp, *sprite, *door, *background, *floor; 
-	SDL_Rect rcBackground; /* background rectangle */
-	SDL_Rect rcFloor; /* chaozinho roxo */
+	SDL_Surface *screen, *temp, *sprite, *door, *floor; 
+	SDL_Rect rcFloor, rcBackground;/* background e chaozinho roxo */
 	/* text stuff */
 	TTF_Font *fntText;
 	SDL_Rect rcText = { 20, 50, 0,0 };
 	SDL_Color clrText = { 0,0,0, 0 };
-
+	char debug[20];
+	SDL_PixelFormat *fmt; 
 	int colorkey;
 	int x,y;
 
@@ -141,10 +159,11 @@ int main(int argc, char* argv[])
 	}
 
 	/* set the title bar */
-	SDL_WM_SetCaption("Open Paradise Cafe", "Open Paradise Cafe");
+	SDL_WM_SetCaption("Open Paradise Café", "Open Paradise Café");
 
 	/* create window */
 	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+	fmt=screen->format; // get pixelformat
 
 	/* set keyboard repeat */
 	SDL_EnableKeyRepeat(70, 70);
@@ -153,14 +172,6 @@ int main(int argc, char* argv[])
 	temp = SDL_LoadBMP("sprites.bmp");
 	sprite = SDL_DisplayFormat(temp);
 	SDL_FreeSurface(temp);
-
-	/* load background image  */
-	temp  = SDL_LoadBMP("back.bmp");
-	background = SDL_DisplayFormat(temp);
-
-	/* ler o chao */
-	temp  = SDL_LoadBMP("ground.bmp");
-	floor = SDL_DisplayFormat(temp);
 
 	/* ler as portas */
 	temp  = SDL_LoadBMP("porta.bmp");
@@ -187,13 +198,23 @@ int main(int argc, char* argv[])
 	rcSrcDoor.y = 0;
 	rcSrcDoor.w = 56; /* so a primeira frame */
 	rcSrcDoor.h = door->h;
-
+	
+	/* posicao inicial da porta */
 	rcDoor.x = 350;
 	rcDoor.y = 126;
 
 	/* chao */
-	rcFloor.h = floor->h;
-	rcFloor.w = floor->w;
+	rcFloor.x=0;
+	rcFloor.y=262;
+	rcFloor.h = 24;
+	rcFloor.w = SCREEN_WIDTH;
+
+	/* background */
+	rcBackground.x=0;
+	rcBackground.y=0;
+	rcBackground.w=SCREEN_WIDTH;
+	rcBackground.h=SCREEN_HEIGHT;
+
 
 	gameover = 0; /* usada pra sair */
 
@@ -227,23 +248,11 @@ int main(int argc, char* argv[])
 			HandleEvent(event);
 		}
 
-		fprintf(stderr,"Porta: x %d , y %d",rcDoor.x,rcDoor.y); 
-
-		/*  draw the background */
-		for (x = 0; x < SCREEN_WIDTH / BACK_SIZE; x++) {
-			for (y = 0; y < SCREEN_HEIGHT / BACK_SIZE; y++) {
-				rcBackground.x = x * BACK_SIZE;
-				rcBackground.y = y * BACK_SIZE;
-				SDL_BlitSurface(background, NULL, screen, &rcBackground);
-			}
-		}
+		/* draw the background */
+		SDL_FillRect(screen, &rcBackground, SDL_MapRGB(fmt,200,65,52)); 
 
 		/* the floor line *purple fag* */
-		for (x = 0; x < SCREEN_WIDTH / floor->w; x++) {
-				rcFloor.x= x * floor->w;
-				rcFloor.y = 262;
-				SDL_BlitSurface(floor, NULL, screen, &rcFloor);
-		}
+		SDL_FillRect(screen, &rcFloor, SDL_MapRGB(fmt,198,0,198)); 
 
 		/* draw the door */
 		SDL_BlitSurface(door, &rcSrcDoor, screen, &rcDoor);
@@ -252,7 +261,8 @@ int main(int argc, char* argv[])
 		SDL_BlitSurface(sprite, &rcSrc, screen, &rcSprite);
 
 		/* render text to an SDL_Surface */
-		SDL_Surface *sText = TTF_RenderText_Solid(fntText, "dongs", clrText);
+		sprintf(debug,"door: x=%d w=%d",rcDoor.x,rcDoor.w);
+		SDL_Surface *sText = TTF_RenderText_Solid(fntText, debug, clrText);
 		/* blit text to the screen */
 		SDL_BlitSurface(sText, NULL, screen, &rcText);
 
@@ -263,7 +273,7 @@ int main(int argc, char* argv[])
 	/* clean up */
 	SDL_FreeSurface(sprite);
 	SDL_FreeSurface(door);
-	SDL_FreeSurface(background);
+//	SDL_FreeSurface(background);
 	SDL_Quit();
 
 	return 0;

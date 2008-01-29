@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 	}
 
 	/* set the title bar */
-	SDL_WM_SetCaption("Open Paradise Café", "Open Paradise Café");
+	SDL_WM_SetCaption("Open Paradise Cafe", "Open Paradise Cafe");
 
 	/* create window */
 	screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);

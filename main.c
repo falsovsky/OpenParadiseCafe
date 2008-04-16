@@ -65,13 +65,15 @@ door_timer_callback(Uint32 interval, void *param)
 	SDL_Event event;
 	const int frame = ((struct door_param_t *) param)->frame;
 
-
 	rcSrcDoor.x = frame * 56;
 
 	if (frame >= 4)
 		SDL_RemoveTimer(((struct door_param_t *) param)->timer);
 	else
 		((struct door_param_t *) param)->frame = frame + 1;
+	
+	
+	
 	event.type = SDL_USEREVENT;
 	event.user.code = USEREVENT_REDRAW;
 	SDL_PushEvent(&event);
@@ -100,8 +102,13 @@ HandleEvent(const SDL_Event event)
 					break;
 
 				case SDLK_LEFT:
-					rcSrc.x = (rcSrc.x + (160 - 40)) % 160;
-					rcDoor.x += 10;
+
+					if (rcSrcDoor.w < 56) {
+						rcSrcDoor.w += 10;
+					} else {
+						rcSrc.x = (rcSrc.x + (160 - 40)) % 160;
+						rcDoor.x += 10;
+					}
 
 					if (rcDoor.x >= SCREEN_WIDTH)
 						rcDoor.x = 0;
@@ -111,14 +118,18 @@ HandleEvent(const SDL_Event event)
 					rcSrc.x = (rcSrc.x + 40) % 160;
 					rcDoor.x -= 10;
 
-					if (rcDoor.x <= 0) {
+					if (rcDoor.x < 0) {
 						rcDoor.x = 0;
-						rcSrcDoor.w -= 10;
-						if (rcSrcDoor.w <= 10) {
+						if (rcSrcDoor.w <= 5) {
 							rcSrcDoor.w = 56;
 							rcSrcDoor.x = 0;
 							rcDoor.x = SCREEN_WIDTH;
 							door_closed = 1;
+						} else {
+							if (rcSrcDoor.w == 6) 
+								rcSrcDoor.w -= 6;
+							else
+								rcSrcDoor.w -= 10;
 						}
 					}
 					break;
@@ -287,6 +298,10 @@ main(int argc, char *argv[])
 	}
 
 	gameover = 0; /* usada pra sair */
+	
+	jewish_param.lol = SDLK_RIGHT;
+	jewish_timer = SDL_AddTimer(100, jewish_timer_callback, &jewish_param);
+	
 	while (!gameover) {
 		SDL_Event event;
 		SDL_WaitEvent(NULL); /* para nao consumir 100% do cpu */
@@ -296,6 +311,9 @@ main(int argc, char *argv[])
 			door_closed = 0;
 			door_param.frame = 1;
 			door_param.timer = SDL_AddTimer(250, door_timer_callback, &door_param);
+			
+			SDL_RemoveTimer(jewish_timer);
+			jewish_timer = NULL;
 /*
 			event.type = SDL_USEREVENT;
 			event.user.code = USEREVENT_DOOR;
@@ -310,13 +328,13 @@ main(int argc, char *argv[])
 			HandleEvent(event);
 
 		/* Draw the wall (red): */
-		SDL_FillRect(screen, &rcWall, SDL_MapRGB(screen->format, 200, 65, 52));
+		SDL_FillRect(screen, &rcWall, SDL_MapRGB(screen->format, 0xc8, 0x41, 0x34));
 
 		/* Draw the floor (purple fag): */
-		SDL_FillRect(screen, &rcFloor, SDL_MapRGB(screen->format, 198, 0, 198));
+		SDL_FillRect(screen, &rcFloor, SDL_MapRGB(screen->format, 0xc6, 0x0, 0xc6));
 
 		/* Draw the status line (blue): */
-		SDL_FillRect(screen, &rcStatus, SDL_MapRGB(screen->format, 0, 0, 198));
+		SDL_FillRect(screen, &rcStatus, SDL_MapRGB(screen->format, 0x0, 0x0, 0xc6));
 
 		/* Draw the door: */
 		SDL_BlitSurface(door, &rcSrcDoor, screen, &rcDoor);

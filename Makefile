@@ -1,3 +1,4 @@
+#testing
 CFLAGS=	-Wall -W -Waggregate-return -Wbad-function-cast -Wcast-align	\
 	-Wcast-qual -Wconversion -Wendif-labels -Wformat=2		\
 	-Wformat-extra-args -Wformat-y2k -Winline			\

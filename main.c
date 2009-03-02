@@ -19,6 +19,11 @@
 
 #define USEREVENT_REDRAW	0
 #define USEREVENT_DOOR		1
+#define USEREVENT_AFTERDOOR	4
+
+/* controlo */
+#define USEREVENT_WALK		2
+#define USEREVENT_STOP		3
 
 Uint32		 jewish_timer_callback(Uint32, void *);
 Uint32		 door_timer_callback(Uint32, void *);
@@ -84,7 +89,7 @@ door_timer_callback(Uint32 interval, void *param)
 void
 HandleEvent(const SDL_Event event)
 {
-	int	i;
+	int i;
 
 
 	switch (event.type) {
@@ -100,7 +105,7 @@ HandleEvent(const SDL_Event event)
 				case SDLK_q:
 					gameover = 1;
 					break;
-
+					/*
 				case SDLK_LEFT:
 
 					if (rcSrcDoor.w < 56) {
@@ -113,7 +118,7 @@ HandleEvent(const SDL_Event event)
 					if (rcDoor.x >= SCREEN_WIDTH)
 						rcDoor.x = 0;
 					break;
-
+*/
 				case SDLK_RIGHT:
 					rcSrc.x = (rcSrc.x + 40) % 160;
 					rcDoor.x -= 10;
@@ -149,6 +154,7 @@ HandleEvent(const SDL_Event event)
 					}
 
 				default:
+					printf("bleh\n");
 					break;
 			}
 			break;
@@ -160,15 +166,18 @@ HandleEvent(const SDL_Event event)
 
 				case USEREVENT_DOOR:
 					printf("wtc\n");
-					if (rcSrcDoor.x == 0)
-						for (i = 0; i <= 4; i++) {
-							rcSrcDoor.x = i * 56;
-/*
-							rcSrcDoor.y = 0;
-							rcSrcDoor.w = 56;
-							rcSrcDoor.h = 136;
-*/
-						}
+					if (rcSrcDoor.x == 0) 
+					for (i = 0; i <= 4; i++) {
+						/*
+						rcSrcDoor.x = i * 56;
+						rcSrcDoor.y = 0;
+						rcSrcDoor.w = 56;
+						rcSrcDoor.h = 136;
+						*/
+					}
+					break;
+				case USEREVENT_AFTERDOOR:
+					break;
 			}
 	}
 }
@@ -314,13 +323,17 @@ main(int argc, char *argv[])
 
 			SDL_RemoveTimer(jewish_timer);
 			jewish_timer = NULL;
-/*
+			
 			event.type = SDL_USEREVENT;
 			event.user.code = USEREVENT_DOOR;
 			event.user.data1 = 0;
 			event.user.data2 = 0;
 			SDL_PushEvent(&event);
-*/
+		}
+
+		/* Ao sair da porta a porta tem que se fechar */
+		if (rcSprite.x == rcDoor.x + 50) {
+			printf("dead by dawn");
 		}
 
 		/* look for an event */

@@ -4,7 +4,7 @@
 * To Public License, Version 2, as published by Sam Hocevar. See
 * http://sam.zoy.org/wtfpl/COPYING for more details.
 *
-* http://www.youtube.com/watch?v=1ayOiJbH6pY
+* http://www.youtube.com/watch?v=mrYJqLzvwn0
 */
 
 /* this game can never fail */
@@ -71,9 +71,9 @@ door_timer_callback(Uint32 interval, void *param)
 		SDL_RemoveTimer(((struct door_param_t *) param)->timer);
 	else
 		((struct door_param_t *) param)->frame = frame + 1;
-	
-	
-	
+
+
+
 	event.type = SDL_USEREVENT;
 	event.user.code = USEREVENT_REDRAW;
 	SDL_PushEvent(&event);
@@ -126,7 +126,7 @@ HandleEvent(const SDL_Event event)
 							rcDoor.x = SCREEN_WIDTH;
 							door_closed = 1;
 						} else {
-							if (rcSrcDoor.w == 6) 
+							if (rcSrcDoor.w == 6)
 								rcSrcDoor.w -= 6;
 							else
 								rcSrcDoor.w -= 10;
@@ -298,10 +298,10 @@ main(int argc, char *argv[])
 	}
 
 	gameover = 0; /* usada pra sair */
-	
+
 	jewish_param.lol = SDLK_RIGHT;
 	jewish_timer = SDL_AddTimer(100, jewish_timer_callback, &jewish_param);
-	
+
 	while (!gameover) {
 		SDL_Event event;
 		SDL_WaitEvent(NULL); /* para nao consumir 100% do cpu */
@@ -311,7 +311,7 @@ main(int argc, char *argv[])
 			door_closed = 0;
 			door_param.frame = 1;
 			door_param.timer = SDL_AddTimer(250, door_timer_callback, &door_param);
-			
+
 			SDL_RemoveTimer(jewish_timer);
 			jewish_timer = NULL;
 /*

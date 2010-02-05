@@ -1,0 +1,16 @@
+- original
+
+A directoria original contem a primeira implementação que tentei fazer com 
+uns amigos, mas que acabei por desistir pois não sei como continuar a partir 
+do que já existe. Porque não tenho grande conhecimento sobre desenvolvimento 
+de jogos, e também porque está uma granda salganhada ;-)
+Estado: Morto, mas aceita-se código! 
+
+
+- cppcafe
+
+O cppcafe é um REMAKE do original, mas como o nome diz, é em C++, o que me 
+levou a usar isto, foi uma bela classe que descobri nas internets de Sprites 
+em SDL - http://ken-soft.com/?p=234
+Estado: Neste momento já faz quase tudo o que o original fazia, mas com praí 
+um terço do código e está bues de bem estruturado IMEO.
